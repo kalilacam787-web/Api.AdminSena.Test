@@ -40,9 +40,11 @@ class ResourceController extends Controller
         return response()->json($query->get());
     }
 
-    public function show(string $resource, string $id)
+    public function show(Request $request, string $id)
     {
         // GET /api/v1/recurso/{id}: devuelve un registro concreto.
+        $resource = $request->route('resource');
+
         return response()->json($this->model($resource)::findOrFail($id));
     }
 
@@ -55,18 +57,20 @@ class ResourceController extends Controller
         return response()->json($item, 201);
     }
 
-    public function update(Request $request, string $resource, string $id)
+    public function update(Request $request, string $id)
     {
-        // Preparado para la siguiente etapa del CRUD: PUT /api/v1/recurso/{id}.
+        // PUT /api/v1/recurso/{id}: actualiza un registro existente.
+        $resource = $request->route('resource');
         $item = $this->model($resource)::findOrFail($id);
         $item->update($request->all());
 
         return response()->json($item);
     }
 
-    public function destroy(string $resource, string $id)
+    public function destroy(Request $request, string $id)
     {
-        // Preparado para la siguiente etapa del CRUD: DELETE /api/v1/recurso/{id}.
+        // DELETE /api/v1/recurso/{id}: elimina un registro existente.
+        $resource = $request->route('resource');
         $item = $this->model($resource)::findOrFail($id);
         $item->delete();
 
