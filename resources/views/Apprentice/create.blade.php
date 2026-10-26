@@ -44,16 +44,6 @@
                     </select>
                 </div>
 
-                <div class="col-md-6">
-                    <label for="computer_id" class="form-label">Computador</label>
-                    <select id="computer_id" name="computer_id" class="form-select" required>
-                        <option value="">Seleccionar computador</option>
-                        @foreach ($computers as $computer)
-                            <option value="{{ $computer->id }}">{{ $computer->number }} - {{ $computer->brand }}</option>
-                        @endforeach
-                    </select>
-                </div>
-
                 <div class="col-12">
                     <button type="submit" class="btn btn-primary">Guardar</button>
                     <a href="{{ route('apprentices.index') }}" class="btn btn-outline-primary ms-2">Ver registros</a>

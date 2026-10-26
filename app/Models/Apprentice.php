@@ -9,7 +9,7 @@ class Apprentice extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['name', 'last_name', 'document_type', 'document_number', 'email', 'password', 'cell_number', 'course_id', 'computer_id'];
+    protected $fillable = ['name', 'last_name', 'document_type', 'document_number', 'email', 'password', 'cell_number', 'course_id'];
 
     protected $hidden = ['password'];
 

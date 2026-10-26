@@ -1357,6 +1357,141 @@ a:hover {
     font-size: 2rem;
 }
 
+.computer-table-wrapper {
+    border: 1px solid rgba(53, 208, 111, 0.24);
+    border-radius: 12px;
+    background: rgba(7, 16, 9, 0.7);
+}
+
+.computer-table {
+    width: 100%;
+    min-width: 660px;
+    margin: 0;
+    table-layout: fixed;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 0.9rem;
+}
+
+.computer-table .computer-column-id { width: 20%; }
+.computer-table .computer-column-brand { width: 12%; }
+.computer-table .computer-column-image { width: 26%; }
+.computer-table .computer-column-assignment { width: 24%; }
+.computer-table .computer-column-actions { width: 18%; }
+
+.table.computer-table thead th {
+    padding: 0.9rem 0.75rem;
+    color: #dfffea !important;
+    background: #14251a;
+    border-bottom: 1px solid rgba(53, 208, 111, 0.28);
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+}
+
+.table.computer-table tbody td {
+    padding: 0.85rem 0.75rem;
+    color: #edf8ef !important;
+    background: transparent;
+    border-bottom: 1px solid rgba(196, 232, 204, 0.1);
+    font-size: 0.9rem;
+    overflow-wrap: anywhere;
+}
+
+.computer-table tbody tr:last-child td {
+    border-bottom: 0;
+}
+
+.computer-table tbody tr:hover td {
+    background: rgba(53, 208, 111, 0.055);
+}
+
+.computer-image-preview,
+.computer-image-placeholder {
+    display: flex;
+    flex: 0 0 64px;
+    width: 80px;
+    height: 64px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(167, 239, 189, 0.25);
+    border-radius: 8px;
+    background: #0b140d;
+    color: #a7efbd;
+    font-size: 0.72rem;
+    object-fit: cover;
+}
+
+.computer-image-content {
+    display: grid;
+    justify-items: start;
+    gap: 0.55rem;
+}
+
+.computer-image-form {
+    display: grid;
+    min-width: 0;
+    width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.4rem;
+}
+
+.computer-image-input {
+    width: 100%;
+    min-width: 0;
+    padding: 0.4rem !important;
+    font-size: 0.72rem !important;
+}
+
+.computer-image-upload {
+    justify-self: start;
+    padding: 0.3rem 0.65rem !important;
+    font-size: 0.75rem !important;
+}
+
+.computer-image-delete .btn {
+    padding: 0.2rem 0 !important;
+    font-size: 0.72rem !important;
+}
+
+.computer-assignment-cell .form-select {
+    min-width: 0;
+    padding: 0.5rem 1.8rem 0.5rem 0.65rem;
+    font-size: 0.82rem !important;
+}
+
+.computer-serial-input {
+    min-width: 0;
+    padding: 0.45rem !important;
+    font-size: 0.82rem !important;
+}
+
+.computer-actions {
+    display: grid;
+    gap: 0.45rem;
+}
+
+.computer-actions form {
+    margin: 0;
+}
+
+.computer-actions .btn {
+    width: 100%;
+    padding: 0.45rem 0.55rem !important;
+    font-size: 0.78rem !important;
+}
+
+.computer-actions .btn-outline-danger {
+    color: #fff;
+    background: #8f2632;
+    border: 1px solid #b13a46;
+}
+
+.computer-table .btn {
+    white-space: nowrap;
+}
+
 /* Tablas */
 table {
     font-size: var(--font-size-base);

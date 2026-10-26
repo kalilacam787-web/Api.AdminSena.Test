@@ -1,7 +1,8 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Api;
 
+use App\Http\Controllers\Controller;
 use App\Models\Apprentice;
 use App\Models\Area;
 use App\Models\Computer;
@@ -12,6 +13,7 @@ use App\Models\Teacher;
 use App\Models\Training_Center;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
 
 class ResourceController extends Controller
 {
@@ -52,7 +54,18 @@ class ResourceController extends Controller
     {
         // POST /api/v1/recurso: crea un registro con los datos recibidos.
         $model = $this->model($resource);
-        $item = $model::create($request->all());
+        if ($resource === 'apprentices') {
+            $request->validate(['computer_id' => 'prohibited']);
+        }
+
+        $data = $resource === 'computers'
+            ? $request->validate([
+                'serial' => ['required', 'regex:/^[0-9]{5,20}$/', 'unique:computers,serial'],
+                'number' => 'required|integer|min:1|max:2147483647|unique:computers,number',
+                'brand' => 'required|string|max:100',
+            ])
+            : $request->all();
+        $item = $model::create($data);
 
         return response()->json($item, 201);
     }
@@ -62,7 +75,18 @@ class ResourceController extends Controller
         // PUT /api/v1/recurso/{id}: actualiza un registro existente.
         $resource = $request->route('resource');
         $item = $this->model($resource)::findOrFail($id);
-        $item->update($request->all());
+        if ($resource === 'apprentices') {
+            $request->validate(['computer_id' => 'prohibited']);
+        }
+
+        $data = $resource === 'computers'
+            ? $request->validate([
+                'serial' => ['sometimes', 'required', 'regex:/^[0-9]{5,20}$/', Rule::unique('computers', 'serial')->ignore($item->id)],
+                'number' => ['sometimes', 'required', 'integer', 'min:1', 'max:2147483647', Rule::unique('computers', 'number')->ignore($item->id)],
+                'brand' => 'sometimes|required|string|max:100',
+            ])
+            : $request->all();
+        $item->update($data);
 
         return response()->json($item);
     }
@@ -75,7 +99,7 @@ class ResourceController extends Controller
         $item->delete();
 
         return response()->json([
-            'message' => Str::headline($resource) . ' eliminado correctamente.',
+            'message' => Str::headline($resource).' eliminado correctamente.',
         ]);
     }
 

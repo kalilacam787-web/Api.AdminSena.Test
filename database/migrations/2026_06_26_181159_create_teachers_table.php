@@ -24,7 +24,7 @@ return new class extends Migration
                 ->on('areas')->onDelete('set null');
 
             $table->foreign('training_center_id')
-                ->references('id')
+                ->references('id') 
                 ->on('training__centers')->onDelete('set null');
 
             $table->timestamps();

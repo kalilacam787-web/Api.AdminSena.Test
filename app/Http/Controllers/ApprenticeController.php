@@ -3,7 +3,6 @@
 namespace App\Http\Controllers;
 
 use App\Models\Apprentice;
-use App\Models\Computer;
 use App\Models\Course;
 use Illuminate\Http\Request;
 
@@ -19,10 +18,9 @@ class ApprenticeController extends Controller
     public function create()
     {
         $courses = Course::all();
-        $computers = Computer::all();
         $apprentices = Apprentice::all();
 
-        return view('Apprentice.create', compact('courses', 'computers', 'apprentices'));
+        return view('Apprentice.create', compact('courses', 'apprentices'));
     }
 
     public function enrollmentForm(Course $course)
@@ -62,7 +60,6 @@ class ApprenticeController extends Controller
             'password' => 'required|string|min:8|max:255',
             'cell_number' => 'nullable|string|max:30',
             'course_id' => 'nullable|exists:courses,id',
-            'computer_id' => 'nullable|exists:computers,id',
         ]);
 
         Apprentice::create($validated);
@@ -77,5 +74,4 @@ class ApprenticeController extends Controller
         return redirect()->route('apprentices.index')->with('success', 'Aprendiz eliminado correctamente.');
     }
 }
-
 

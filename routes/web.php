@@ -10,11 +10,21 @@ use App\Http\Controllers\GalleryController;
 use App\Http\Controllers\TeacherController;
 use App\Http\Controllers\TrainingCenterController;
 use App\Models\Gallery;
-use Illuminate\Support\Facades\Route;
+use Illuminate\Database\QueryException;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Route; 
 
 // Home
 Route::get('/', function () {
-    $databaseGalleries = Gallery::where('is_active', 1)->orderBy('order')->get();
+    try {
+        $databaseGalleries = Gallery::where('is_active', 1)->orderBy('order')->get();
+    } catch (QueryException $exception) {
+        Log::warning('Unable to load the home page gallery; using project images.', [
+            'exception' => $exception,
+        ]);
+
+        $databaseGalleries = collect();
+    }
 
     $folderPath = public_path('imagene/Imagenes SENA');
     $projectImages = collect();
@@ -36,7 +46,7 @@ Route::get('/', function () {
 
     $galleries = $databaseGalleries->isNotEmpty() ? $databaseGalleries : $projectImages;
 
-    return view('welcome', ['galleries' => $galleries]);
+    return view('welcome', ['galleries' => $galleries]); 
 });
 
 // Authentication Routes
@@ -44,7 +54,7 @@ Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
 Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
 Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
 Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout'); 
 Route::get('apprentices/access', [AuthController::class, 'showApprenticeAccess'])->name('apprentices.access');
 Route::post('apprentices/access', [AuthController::class, 'apprenticeAccess']);
 
@@ -68,6 +78,9 @@ Route::post('training-centers', [TrainingCenterController::class, 'store'])->nam
 Route::get('computers', [ComputerController::class, 'index'])->name('computers.index');
 Route::get('computers/create', [ComputerController::class, 'create'])->name('computers.create');
 Route::post('computers', [ComputerController::class, 'store'])->name('computers.store');
+Route::put('computers/{computer}/assignment', [ComputerController::class, 'assign'])->name('computers.assignment');
+Route::post('computers/{computer}/image', [ComputerController::class, 'uploadImage'])->name('computers.image.upload');
+Route::delete('computers/{computer}/image', [ComputerController::class, 'deleteImage'])->name('computers.image.destroy');
 Route::delete('computers/{computer}', [ComputerController::class, 'destroy'])->name('computers.destroy');
 
 // Courses Routes

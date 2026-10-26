@@ -48,7 +48,7 @@
                                     </td>
                                     <td>
                                         @if ($apprentice->computer)
-                                            {{ $apprentice->computer->number }} / {{ $apprentice->computer->brand }}
+                                            {{ $apprentice->computer->brand }} #{{ $apprentice->computer->number }}
                                         @else
                                             <span class="text-muted">Sin computador</span>
                                         @endif
