@@ -24,20 +24,17 @@ class ComputerImageTest extends TestCase
 
         Schema::create('computers', function (Blueprint $table) {
             $table->id();
+            $table->string('serial')->nullable()->unique();
             $table->string('number')->unique();
             $table->string('brand');
             $table->unsignedBigInteger('teacher_id')->nullable();
+            $table->string('image_path')->nullable();
+            $table->string('image_public_id')->nullable();
             $table->timestamps();
         });
 
-        $migration = require database_path('migrations/2026_10_26_100000_add_image_path_to_computers_table.php');
+        $migration = require database_path('migrations/2026_11_19_164000_create_imagenes_table.php');
         $migration->up();
-
-        $serialMigration = require database_path('migrations/2026_10_26_110000_add_serial_to_computers_table.php');
-        $serialMigration->up();
-
-        $imagePublicIdMigration = require database_path('migrations/2026_10_26_120000_add_image_public_id_to_computers_table.php');
-        $imagePublicIdMigration->up();
 
         Schema::create('apprentices', function (Blueprint $table) {
             $table->id();
@@ -86,6 +83,8 @@ class ComputerImageTest extends TestCase
         $firstImagePath = $computer->image_path;
         $this->assertSame('https://res.cloudinary.com/demo/image/upload/first.png', $firstImagePath);
         $this->assertSame('adminsena/computers/first', $computer->image_public_id);
+        $this->assertSame(1, $computer->imagenes()->count());
+        $this->assertSame('adminsena/computers/first', $computer->imagenes()->firstOrFail()->public_id);
 
         $this->post(route('computers.image.upload', $computer), [
             'image' => $this->fakeImage('replacement.png'),
@@ -96,12 +95,15 @@ class ComputerImageTest extends TestCase
         $this->assertNotSame($firstImagePath, $replacementImagePath);
         $this->assertSame('https://res.cloudinary.com/demo/image/upload/replacement.png', $replacementImagePath);
         $this->assertSame('adminsena/computers/replacement', $computer->image_public_id);
+        $this->assertSame(1, $computer->imagenes()->count());
+        $this->assertSame('adminsena/computers/replacement', $computer->imagenes()->firstOrFail()->public_id);
 
         $this->delete(route('computers.image.destroy', $computer))
             ->assertRedirect(route('computers.index'));
 
         $this->assertNull($computer->fresh()->image_path);
         $this->assertNull($computer->fresh()->image_public_id);
+        $this->assertSame(0, $computer->imagenes()->count());
     }
 
     public function test_computer_pages_offer_image_upload_and_use_requested_assignment_label(): void

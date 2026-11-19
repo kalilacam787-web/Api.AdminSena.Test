@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasImages;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Apprentice extends Model
 {
-    use HasFactory;
+    use HasFactory, HasImages;
 
     protected $fillable = ['name', 'last_name', 'document_type', 'document_number', 'email', 'password', 'cell_number', 'course_id'];
 

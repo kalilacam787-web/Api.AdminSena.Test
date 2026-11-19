@@ -49,8 +49,9 @@ class ComputerController extends Controller
         }
 
         unset($data['image']);
+        $computer = null;
         try {
-            DB::transaction(function () use (&$data) {
+            DB::transaction(function () use (&$data, &$computer) {
                 $lastNumber = Computer::query()
                     ->lockForUpdate()
                     ->pluck('number')
@@ -63,7 +64,15 @@ class ComputerController extends Controller
                 }
 
                 $data['number'] = $lastNumber + 1;
-                Computer::create($data);
+                $computer = Computer::create($data);
+
+                if (! empty($data['image_public_id'])) {
+                    $computer->imagenes()->create([
+                        'path' => $data['image_path'],
+                        'disk' => 'cloudinary',
+                        'public_id' => $data['image_public_id'],
+                    ]);
+                }
             });
         } catch (Throwable $exception) {
             if (! empty($data['image_public_id'])) {
@@ -94,7 +103,15 @@ class ComputerController extends Controller
         $computer->image_path = $asset['url'];
         $computer->image_public_id = $asset['public_id'];
         try {
-            $computer->save();
+            DB::transaction(function () use ($computer, $asset) {
+                $computer->save();
+                $computer->imagenes()->delete();
+                $computer->imagenes()->create([
+                    'path' => $asset['url'],
+                    'disk' => 'cloudinary',
+                    'public_id' => $asset['public_id'],
+                ]);
+            });
         } catch (Throwable $exception) {
             try {
                 $images->delete($asset['public_id']);
@@ -117,6 +134,7 @@ class ComputerController extends Controller
         $this->deletePreviousImage($images, $computer->image_path, $computer->image_public_id);
 
         $computer->update(['image_path' => null, 'image_public_id' => null]);
+        $computer->imagenes()->delete();
 
         return redirect()->route('computers.index')->with('success', 'Imagen del computador eliminada correctamente.');
     }
@@ -163,6 +181,7 @@ class ComputerController extends Controller
     public function destroy(Computer $computer, ComputerImageStorage $images)
     {
         $this->deletePreviousImage($images, $computer->image_path, $computer->image_public_id);
+        $computer->imagenes()->delete();
         $computer->delete();
 
         return redirect()->route('computers.index')->with('success', 'Computador eliminado correctamente.');
