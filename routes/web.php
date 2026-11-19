@@ -1,18 +1,10 @@
 <?php
 
-use App\Http\Controllers\ApprenticeController;
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\AdminController;
-use App\Http\Controllers\ComputerController;
-use App\Http\Controllers\ContactController;
-use App\Http\Controllers\CourseController;
-use App\Http\Controllers\GalleryController;
-use App\Http\Controllers\TeacherController;
-use App\Http\Controllers\TrainingCenterController;
+use App\Http\Controllers\Api\ResourceController;
 use App\Models\Gallery;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Route; 
+use Illuminate\Support\Facades\Route;
 
 // Home
 Route::get('/', function () {
@@ -30,13 +22,13 @@ Route::get('/', function () {
     $projectImages = collect();
 
     if (is_dir($folderPath)) {
-        $projectImages = collect(glob($folderPath . DIRECTORY_SEPARATOR . '*'))
+        $projectImages = collect(glob($folderPath.DIRECTORY_SEPARATOR.'*'))
             ->filter(fn ($file) => is_file($file))
             ->reject(fn ($file) => strtolower(basename($file)) === 'images.png')
             ->map(function ($file) {
                 return (object) [
                     'title' => '',
-                    'image_path' => 'imagene/Imagenes SENA/' . basename($file),
+                    'image_path' => 'imagene/Imagenes SENA/'.basename($file),
                     'description' => '',
                     'order' => 0,
                     'is_active' => true,
@@ -46,60 +38,72 @@ Route::get('/', function () {
 
     $galleries = $databaseGalleries->isNotEmpty() ? $databaseGalleries : $projectImages;
 
-    return view('welcome', ['galleries' => $galleries]); 
+    return view('welcome', ['galleries' => $galleries]);
 });
 
 // Authentication Routes
-Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
-Route::post('/login', [AuthController::class, 'login'])->name('auth.login');
-Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
-Route::post('/register', [AuthController::class, 'register'])->name('auth.register');
-Route::post('/logout', [AuthController::class, 'logout'])->name('logout'); 
-Route::get('apprentices/access', [AuthController::class, 'showApprenticeAccess'])->name('apprentices.access');
-Route::post('apprentices/access', [AuthController::class, 'apprenticeAccess']);
+Route::get('/login', [ResourceController::class, 'authShowLogin'])->name('login');
+Route::post('/login', [ResourceController::class, 'authLogin'])->name('auth.login');
+Route::get('/register', [ResourceController::class, 'authShowRegister'])->name('register');
+Route::post('/register', [ResourceController::class, 'authRegister'])->name('auth.register');
+Route::post('/logout', [ResourceController::class, 'authLogout'])->name('logout');
+Route::get('apprentices/access', [ResourceController::class, 'authShowApprenticeAccess'])->name('apprentices.access');
+Route::post('apprentices/access', [ResourceController::class, 'authApprenticeAccess']);
 
 Route::middleware('auth')->group(function () {
-    Route::get('/admin/perfil', [AdminController::class, 'profile'])->name('admin.profile');
-    Route::put('/admin/perfil', [AdminController::class, 'update'])->name('admin.profile.update');
+    Route::get('/admin/perfil', [ResourceController::class, 'adminProfile'])->name('admin.profile');
+    Route::put('/admin/perfil', [ResourceController::class, 'adminUpdate'])->name('admin.profile.update');
 });
 
 // Contact Routes
-Route::resource('contacts', ContactController::class);
+Route::get('contacts', [ResourceController::class, 'contactIndex'])->name('contacts.index');
+Route::get('contacts/create', [ResourceController::class, 'contactCreate'])->name('contacts.create');
+Route::post('contacts', [ResourceController::class, 'contactStore'])->name('contacts.store');
+Route::get('contacts/{contact}', [ResourceController::class, 'contactShow'])->name('contacts.show');
+Route::get('contacts/{contact}/edit', [ResourceController::class, 'contactEdit'])->name('contacts.edit');
+Route::match(['PUT', 'PATCH'], 'contacts/{contact}', [ResourceController::class, 'contactUpdate'])->name('contacts.update');
+Route::delete('contacts/{contact}', [ResourceController::class, 'contactDestroy'])->name('contacts.destroy');
 
 // Gallery Routes
-Route::resource('galleries', GalleryController::class);
+Route::get('galleries', [ResourceController::class, 'galleryIndex'])->name('galleries.index');
+Route::get('galleries/create', [ResourceController::class, 'galleryCreate'])->name('galleries.create');
+Route::post('galleries', [ResourceController::class, 'galleryStore'])->name('galleries.store');
+Route::get('galleries/{gallery}', [ResourceController::class, 'galleryShow'])->name('galleries.show');
+Route::get('galleries/{gallery}/edit', [ResourceController::class, 'galleryEdit'])->name('galleries.edit');
+Route::match(['PUT', 'PATCH'], 'galleries/{gallery}', [ResourceController::class, 'galleryUpdate'])->name('galleries.update');
+Route::delete('galleries/{gallery}', [ResourceController::class, 'galleryDestroy'])->name('galleries.destroy');
 
 // Training Centers Routes
-Route::get('training-centers', [TrainingCenterController::class, 'index'])->name('training-centers.index');
-Route::get('training-centers/create', [TrainingCenterController::class, 'create'])->name('training-centers.create');
-Route::post('training-centers', [TrainingCenterController::class, 'store'])->name('training-centers.store');
+Route::get('training-centers', [ResourceController::class, 'trainingCenterIndex'])->name('training-centers.index');
+Route::get('training-centers/create', [ResourceController::class, 'trainingCenterCreate'])->name('training-centers.create');
+Route::post('training-centers', [ResourceController::class, 'trainingCenterStore'])->name('training-centers.store');
 
 // Computers Routes
-Route::get('computers', [ComputerController::class, 'index'])->name('computers.index');
-Route::get('computers/create', [ComputerController::class, 'create'])->name('computers.create');
-Route::post('computers', [ComputerController::class, 'store'])->name('computers.store');
-Route::put('computers/{computer}/assignment', [ComputerController::class, 'assign'])->name('computers.assignment');
-Route::post('computers/{computer}/image', [ComputerController::class, 'uploadImage'])->name('computers.image.upload');
-Route::delete('computers/{computer}/image', [ComputerController::class, 'deleteImage'])->name('computers.image.destroy');
-Route::delete('computers/{computer}', [ComputerController::class, 'destroy'])->name('computers.destroy');
+Route::get('computers', [ResourceController::class, 'computerIndex'])->name('computers.index');
+Route::get('computers/create', [ResourceController::class, 'computerCreate'])->name('computers.create');
+Route::post('computers', [ResourceController::class, 'computerStore'])->name('computers.store');
+Route::put('computers/{computer}/assignment', [ResourceController::class, 'computerAssign'])->name('computers.assignment');
+Route::post('computers/{computer}/image', [ResourceController::class, 'computerUploadImage'])->name('computers.image.upload');
+Route::delete('computers/{computer}/image', [ResourceController::class, 'computerDeleteImage'])->name('computers.image.destroy');
+Route::delete('computers/{computer}', [ResourceController::class, 'computerDestroy'])->name('computers.destroy');
 
 // Courses Routes
-Route::get('courses', [CourseController::class, 'index'])->name('courses.index');
-Route::get('courses/{course}/info', [CourseController::class, 'information'])->name('courses.information');
-Route::get('courses/create', [CourseController::class, 'create'])->name('courses.create');
-Route::post('courses', [CourseController::class, 'store'])->name('courses.store');
+Route::get('courses', [ResourceController::class, 'courseIndex'])->name('courses.index');
+Route::get('courses/{course}/info', [ResourceController::class, 'courseInformation'])->name('courses.information');
+Route::get('courses/create', [ResourceController::class, 'courseCreate'])->name('courses.create');
+Route::post('courses', [ResourceController::class, 'courseStore'])->name('courses.store');
 
 // Teachers Routes
-Route::get('teachers', [TeacherController::class, 'index'])->name('teachers.index');
-Route::get('teachers/create', [TeacherController::class, 'create'])->name('teachers.create');
-Route::post('teachers', [TeacherController::class, 'store'])->name('teachers.store');
+Route::get('teachers', [ResourceController::class, 'teacherIndex'])->name('teachers.index');
+Route::get('teachers/create', [ResourceController::class, 'teacherCreate'])->name('teachers.create');
+Route::post('teachers', [ResourceController::class, 'teacherStore'])->name('teachers.store');
 
 // Apprentices Routes
 Route::middleware('apprentice.access')->group(function () {
-    Route::get('apprentices', [ApprenticeController::class, 'index'])->name('apprentices.index');
-    Route::get('apprentices/create', [ApprenticeController::class, 'create'])->name('apprentices.create');
-    Route::post('apprentices', [ApprenticeController::class, 'store'])->name('apprentices.store');
-    Route::delete('apprentices/{apprentice}', [ApprenticeController::class, 'destroy'])->name('apprentices.destroy');
+    Route::get('apprentices', [ResourceController::class, 'apprenticeIndex'])->name('apprentices.index');
+    Route::get('apprentices/create', [ResourceController::class, 'apprenticeCreate'])->name('apprentices.create');
+    Route::post('apprentices', [ResourceController::class, 'apprenticeStore'])->name('apprentices.store');
+    Route::delete('apprentices/{apprentice}', [ResourceController::class, 'apprenticeDestroy'])->name('apprentices.destroy');
 });
-Route::get('courses/{course}/enroll', [ApprenticeController::class, 'enrollmentForm'])->name('courses.enroll.form');
-Route::post('courses/{course}/enroll', [ApprenticeController::class, 'enroll'])->name('courses.enroll');
+Route::get('courses/{course}/enroll', [ResourceController::class, 'apprenticeEnrollmentForm'])->name('courses.enroll.form');
+Route::post('courses/{course}/enroll', [ResourceController::class, 'apprenticeEnroll'])->name('courses.enroll');
