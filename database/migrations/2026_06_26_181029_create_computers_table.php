@@ -13,8 +13,14 @@ return new class extends Migration
     {
         Schema::create('computers', function (Blueprint $table) {
             $table->id();
-            $table->string('number');
+            $table->string('serial', 20)->nullable()->unique();
+            $table->string('number')->unique();
             $table->string('brand');
+            $table->string('assigned_name')->nullable();
+            $table->string('assigned_document')->nullable();
+            $table->string('assigned_email')->nullable();
+            $table->string('image_path')->nullable();
+            $table->string('image_public_id')->nullable();
 
             $table->timestamps();
         });

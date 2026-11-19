@@ -14,7 +14,9 @@ return new class extends Migration
         Schema::create('teachers', function (Blueprint $table) {
             $table->id();
             $table->string('name');
+            $table->string('document_number')->nullable()->unique();
             $table->string('email');
+            $table->string('access_code')->nullable()->unique();
 
             $table->unsignedBigInteger('area_id')->nullable();
             $table->unsignedBigInteger('training_center_id')->nullable();
@@ -28,6 +30,13 @@ return new class extends Migration
                 ->on('training__centers')->onDelete('set null');
 
             $table->timestamps();
+        });
+
+        Schema::table('computers', function (Blueprint $table) {
+            $table->foreignId('teacher_id')
+                ->nullable()
+                ->constrained('teachers')
+                ->nullOnDelete();
         });
     }
 

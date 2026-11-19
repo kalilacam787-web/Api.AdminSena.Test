@@ -14,7 +14,10 @@ return new class extends Migration
         Schema::create('courses', function (Blueprint $table) {
             $table->id();
             $table->string('course_number');
+            $table->string('name')->nullable();
             $table->string('day');
+            $table->string('schedule')->nullable();
+            $table->unsignedTinyInteger('duration_months')->nullable();
 
             $table->unsignedBigInteger('area_id')->nullable();
             $table->unsignedBigInteger('training_center_id')->nullable();

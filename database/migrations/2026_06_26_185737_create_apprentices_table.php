@@ -15,7 +15,11 @@ return new class extends Migration
             $table->id();
             //campos  
             $table->string('name');
+            $table->string('last_name')->nullable();
+            $table->string('document_type', 10)->nullable();
+            $table->string('document_number')->nullable()->unique();
             $table->string('email');
+            $table->string('password')->nullable();
             $table->string('cell_number');
 
             // llaves foraneas de courses y computers
